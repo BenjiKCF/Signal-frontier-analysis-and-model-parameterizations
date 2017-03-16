@@ -9,14 +9,18 @@ import matplotlib.pyplot as plt
 plt.rc('figure', figsize=(12, 6))
 from pandas_datareader import data, wb
 
+# Downloading data
 names = ['AAPL', 'GOOG', 'MSFT', 'DELL', 'GS', 'MS', 'BAC', 'C']
 def get_px(stock, start, end):
     return data.DataReader(stock, 'yahoo', start=start, end=end)['Adj Close']
 px = DataFrame({n: get_px(n, None, None) for n in names})
 
+# Business day
 px = px.asfreq('B').fillna(method='pad')
 rets = px.pct_change()
 ((1 + rets).cumprod() - 1).plot()
+
+# Calculate momentum
 def calc_mom(price, lookback, lag):
     mom_ret = price.shift(lag).pct_change(lookback)
     ranks = mom_ret.rank(axis=1, ascending=False)
